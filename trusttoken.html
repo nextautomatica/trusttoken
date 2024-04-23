@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustToken Security Check</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            color: #333;
+            text-align: center;
+            padding-top: 100px;
+        }
+        #logo {
+            margin-bottom: 50px;
+            font-size: xx-large;
+        }
+        input[type="text"] {
+            width: 300px;
+            height: 40px;
+            font-size: 16px;
+            padding: 0 10px;
+            margin-top: 20px;
+        }
+        button {
+            width: 150px;
+            height: 40px;
+            font-size: 16px;
+            color: white;
+            background-color: #4CAF50;
+            border: none;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="logo">
+        TrustToken
+    </div>
+    <input type="text" id="urlInput" placeholder="Enter website URL" onkeypress="handleKeyPress(event)">
+    <br>
+    <button id="checkButton" onclick="checkSecurity()">Check Security</button>
+    <div id="results"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const params = new URLSearchParams(window.location.search);
+            const url = params.get('url');
+            if (url) {
+                document.getElementById('urlInput').value = url;
+                checkSecurity();
+            }
+        });
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                checkSecurity();
+            }
+        }
+
+        function checkSecurity() {
+            var urlInput = document.getElementById('urlInput');
+            var url = urlInput.value.trim();
+            var results = document.getElementById('results');
+            var button = document.getElementById('checkButton');
+            button.disabled = true; // Disable the button to prevent multiple submissions
+            results.innerHTML = ''; // Clear previous results
+
+            // Basic URL validation
+            if (!url.match(/^https?:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/[^\s]*)?$/)) {
+                results.textContent = 'Invalid URL format. Please enter a valid URL.';
+                button.disabled = false; // Re-enable the button if the check fails
+                return;
+            }
+
+            // Check for suspicious patterns
+            if (url.includes('@')) {
+                results.textContent += 'Warning: URL contains suspicious characters.\n';
+            }
+
+            if (url.match(/\d+\.\d+\.\d+\.\d+/)) {
+                results.textContent += 'Warning: URL contains IP address, which can be risky.\n';
+            }
+
+            if (results.textContent === '') {
+                results.textContent = 'Basic checks passed. Redirecting in 2 seconds...';
+                setTimeout(function() {
+                    window.location.replace(url); // Redirect to the URL after 2 seconds
+                }, 2000); // 2000 milliseconds = 2 seconds
+            } else {
+                button.disabled = false; // Re-enable the button if there are warnings
+            }
+        }
+    </script>
+</body>
+</html>
